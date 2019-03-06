@@ -13,14 +13,16 @@ public interface UsersRepository {
 
     void fetchUsers(int count);
 
-    void fetchUser();
+    void fetchUser(int idUser);
 
     List<Result>  getUsers();
 
 
     void saveUsers(List<Result> lists);
 
-    void updateUser();
+    void updateUser(int id);
+
+    void deleteUser(int id);
 
     void deleteUsers();
 

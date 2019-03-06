@@ -1,37 +1,20 @@
 package com.example.mvp.home;
 
 import android.content.ContentResolver;
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.net.Uri;
-import android.util.Log;
-
-import com.example.mvp.data.local.UserContract;
-import com.example.mvp.data.local.UserProvider;
-import com.example.mvp.data.remote.randomapi.RandomAPI;
-import com.example.mvp.data.remote.randomapi.RandomAPIService;
-import com.example.mvp.data.remote.randomapi.UserRemoteRepository;
+import com.example.mvp.data.local.UserLocalRepository;
 import com.example.mvp.data.remote.randomapi.to.Result;
-import com.example.mvp.util.NetworkError;
-import com.example.mvp.util.NetworkManager;
-import com.google.gson.Gson;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class HomePresenter implements HomeContract.Presenter {
 
     public static final String TAG="HomePresenter_TAG";
-    private UserRemoteRepository userRemoteRepository;
+    private UserLocalRepository userLocalRepository;
 
     public HomePresenter(HomeContract.View homeView,ContentResolver contentResolver) {
         /*this.homeView = homeView;
         NetworkManager networkManager = new NetworkManager();
         randomAPIService = new RandomAPIService(networkManager.provideRandomAPI(RandomAPI.BASE_URL));*/
-        userRemoteRepository = new UserRemoteRepository(homeView,contentResolver);
+        userLocalRepository = new UserLocalRepository(homeView,contentResolver);
     }
 
     @Override
@@ -47,7 +30,28 @@ public class HomePresenter implements HomeContract.Presenter {
                 homeView.showError(error);
             }
         });*/
-        userRemoteRepository.fetchUsers(count);
+        userLocalRepository.fetchUsers(count);
+    }
+
+    @Override
+    public void fetchUser(int _id) {
+        userLocalRepository.fetchUser(_id);
+    }
+
+    @Override
+    public void deleteUser(int _id) {
+        userLocalRepository.deleteUser(_id);
+
+    }
+
+    @Override
+    public void updateUser(int _id) {
+        userLocalRepository.updateUser(_id);
+    }
+
+    @Override
+    public void deleteUsers() {
+        userLocalRepository.deleteUsers();
     }
 
     @Override
@@ -77,11 +81,11 @@ public class HomePresenter implements HomeContract.Presenter {
             }
         }.run();*/
 
-        userRemoteRepository.saveUsers(results);
+        userLocalRepository.saveUsers(results);
     }
 
     @Override
     public List<Result> getData(ContentResolver contentResolver) {
-            return userRemoteRepository.getUsers();
+            return userLocalRepository.getUsers();
     }
 }

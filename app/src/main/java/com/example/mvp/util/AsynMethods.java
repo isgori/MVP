@@ -108,19 +108,34 @@ public class AsynMethods {
 
 
     public static class deleteAllUsersAsyncTask extends AsyncTask<Void, Void, Void> {
-        private HomeContract.View homeView;
-        ContentResolver contentResolver;
 
-        public deleteAllUsersAsyncTask(ContentResolver contentResolver, HomeContract.View homeView) {
+        ContentResolver contentResolver;
+        public deleteAllUsersAsyncTask(ContentResolver contentResolver) {
             this.contentResolver = contentResolver;
-            this.homeView = homeView;
         }
 
 
         @Override
         protected Void doInBackground(Void... lists) {
 
-            contentResolver.delete(UserContract.UserEntry.CONTENT_URI, null, null);
+            contentResolver.delete(UserContract.UserEntry.CONTENT_URI, null  , null);
+            Log.d(TAG, "run: Finish");
+            return null;
+        }
+    }
+
+    public static class deleteUserAsyncTask extends AsyncTask<Integer, Void, Void> {
+
+        ContentResolver contentResolver;
+        public deleteUserAsyncTask(ContentResolver contentResolver) {
+            this.contentResolver = contentResolver;
+        }
+
+
+        @Override
+        protected Void doInBackground(Integer... lists) {
+
+            contentResolver.delete(UserContract.UserEntry.CONTENT_URI,  UserContract.UserEntry._ID+" = " + lists[0].toString()  , null);
             Log.d(TAG, "run: Finish");
             return null;
         }
@@ -150,6 +165,55 @@ public class AsynMethods {
                     homeView.showError(error);
                 }
             });
+            return null;
+        }
+    }
+
+    public static class fetchUserAsyncTask extends AsyncTask<Integer, Void, Void> {
+        private HomeContract.View homeView;
+        ContentResolver contentResolver;
+        private String [] columns = {UserContract.UserEntry._ID,UserContract.UserEntry.NAME_COLUMN,UserContract.UserEntry.LAST_COLUMN,UserContract.UserEntry.JSON_COLUMN};
+        List<Result> list = new ArrayList<>();
+        public fetchUserAsyncTask(ContentResolver contentResolver, HomeContract.View homeView) {
+            this.contentResolver = contentResolver;
+            this.homeView = homeView;
+        }
+
+        public List<Result> getData(){
+            return list;
+        }
+        @Override
+        protected Void doInBackground(Integer... _id) {
+            try {
+                Cursor query = contentResolver.query(
+                        UserContract.UserEntry.buildMovieUri(_id[0]),
+                        columns,null,null,null
+                );
+
+
+                 if (query!= null   ){
+                     query.moveToPosition(0);
+                     String id = query.getString(query.getColumnIndexOrThrow(UserContract.UserEntry._ID));
+                     String name = query.getString(query.getColumnIndexOrThrow(UserContract.UserEntry.NAME_COLUMN));
+                     String last = query.getString(query.getColumnIndexOrThrow(UserContract.UserEntry.LAST_COLUMN ));
+                     String json = query.getString(query.getColumnIndexOrThrow(UserContract.UserEntry.JSON_COLUMN));
+
+                     if (json!= null){
+                         Gson gson = new Gson();
+                         Log.d(TAG, "getData: " + json);
+                         JSONArray jsonArray = new JSONArray(json);
+                         Result result  = gson.fromJson(jsonArray.getJSONObject(0).toString(), Result.class);
+                         list.add(result);
+                     }
+
+                 }
+
+            }catch (Exception ex)
+            {
+                ex.printStackTrace();
+                Log.d(TAG, "getData: " + ex.getMessage());
+            }
+
             return null;
         }
     }

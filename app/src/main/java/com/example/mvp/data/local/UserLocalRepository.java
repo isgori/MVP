@@ -5,7 +5,6 @@ import android.content.ContentResolver;
 import com.example.mvp.data.UsersRepository;
 import com.example.mvp.data.remote.randomapi.RandomAPI;
 import com.example.mvp.data.remote.randomapi.RandomAPIService;
-import com.example.mvp.data.remote.randomapi.UserRemoteRepository;
 import com.example.mvp.data.remote.randomapi.to.Result;
 import com.example.mvp.home.HomeContract;
 import com.example.mvp.util.AsynMethods;
@@ -35,8 +34,8 @@ public class UserLocalRepository implements UsersRepository {
     }
 
     @Override
-    public void fetchUser() {
-
+    public void fetchUser(int idUser) {
+        new AsynMethods.fetchUserAsyncTask(contentResolver,homeView).execute(idUser);
     }
 
     @Override
@@ -52,13 +51,19 @@ public class UserLocalRepository implements UsersRepository {
     }
 
     @Override
-    public void updateUser() {
+    public void updateUser(int user) {
+
 
     }
 
     @Override
+    public void deleteUser(int id) {
+        new AsynMethods.deleteUserAsyncTask(contentResolver).execute(id);
+    }
+
+    @Override
     public void deleteUsers() {
-        new AsynMethods.deleteAllUsersAsyncTask(contentResolver,homeView).execute();
+        new AsynMethods.deleteAllUsersAsyncTask(contentResolver).execute();
 
     }
 }

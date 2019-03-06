@@ -18,6 +18,11 @@ public interface HomeContract {
     interface Presenter extends BasePresenter {
 
         void fetchUsers(int count);
+        void fetchUser(int _id);
+        void deleteUser(int _id);
+        void updateUser(int _id);
+        void deleteUsers();
+
         void saveData(List<Result> results);
         List<Result> getData(ContentResolver contentResolver);
     }

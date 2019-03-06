@@ -37,8 +37,8 @@ public class UserRemoteRepository implements UsersRepository {
     }
 
     @Override
-    public void fetchUser() {
-
+    public void fetchUser(int idUser) {
+        new AsynMethods.fetchUserAsyncTask(contentResolver,homeView).execute(idUser);
     }
 
     @Override
@@ -47,13 +47,19 @@ public class UserRemoteRepository implements UsersRepository {
     }
 
     @Override
-    public void updateUser() {
+    public void updateUser(int user) {
+
+    }
+
+    @Override
+    public void deleteUser(int user) {
+        new AsynMethods.deleteUserAsyncTask(contentResolver).execute(user);
 
     }
 
     @Override
     public void deleteUsers() {
-        new AsynMethods.deleteAllUsersAsyncTask(contentResolver,homeView).execute();
+        new AsynMethods.deleteAllUsersAsyncTask(contentResolver).execute();
 
     }
 
