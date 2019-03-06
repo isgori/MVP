@@ -1,5 +1,7 @@
 package com.example.mvp.data;
 
+import android.content.ContentValues;
+
 import com.example.mvp.data.remote.randomapi.to.Result;
 
 import java.util.List;
@@ -17,10 +19,11 @@ public interface UsersRepository {
 
     List<Result>  getUsers();
 
+    void tearDown();
 
     void saveUsers(List<Result> lists);
 
-    void updateUser(int id);
+    void updateUser(int id, ContentValues data);
 
     void deleteUser(int id);
 

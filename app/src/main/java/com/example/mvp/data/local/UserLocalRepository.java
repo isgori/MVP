@@ -1,6 +1,7 @@
 package com.example.mvp.data.local;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 
 import com.example.mvp.data.UsersRepository;
 import com.example.mvp.data.remote.randomapi.RandomAPI;
@@ -51,8 +52,9 @@ public class UserLocalRepository implements UsersRepository {
     }
 
     @Override
-    public void updateUser(int user) {
+    public void updateUser(int user, ContentValues data) {
 
+        new AsynMethods.updateUserAsyncTask(contentResolver,data).execute(user);
 
     }
 
@@ -65,5 +67,10 @@ public class UserLocalRepository implements UsersRepository {
     public void deleteUsers() {
         new AsynMethods.deleteAllUsersAsyncTask(contentResolver).execute();
 
+    }
+
+    @Override
+    public void tearDown() {
+        homeView =null;
     }
 }

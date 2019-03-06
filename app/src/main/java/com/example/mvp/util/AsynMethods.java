@@ -217,4 +217,38 @@ public class AsynMethods {
             return null;
         }
     }
+
+    public static class updateUserAsyncTask extends AsyncTask<Integer, Void, Void> {
+
+        ContentResolver contentResolver;
+        private String [] columns = {UserContract.UserEntry._ID,UserContract.UserEntry.NAME_COLUMN,UserContract.UserEntry.LAST_COLUMN,UserContract.UserEntry.JSON_COLUMN};
+        List<Result> list = new ArrayList<>();
+        ContentValues informationToUpdate  ;
+        public updateUserAsyncTask(ContentResolver contentResolver,ContentValues informationToUpdate) {
+            this.contentResolver = contentResolver;
+            this.informationToUpdate = informationToUpdate;
+        }
+
+        public List<Result> getData(){
+            return list;
+        }
+        @Override
+        protected Void doInBackground(Integer... _id) {
+            try {
+                int query = contentResolver.update(
+                        UserContract.UserEntry.buildMovieUri(_id[0]),
+                        informationToUpdate,
+                        null,
+                        null
+                );
+
+            }catch (Exception ex)
+            {
+                ex.printStackTrace();
+                Log.d(TAG, "getData: " + ex.getMessage());
+            }
+
+            return null;
+        }
+    }
 }

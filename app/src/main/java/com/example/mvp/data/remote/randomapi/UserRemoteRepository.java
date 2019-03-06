@@ -47,8 +47,9 @@ public class UserRemoteRepository implements UsersRepository {
     }
 
     @Override
-    public void updateUser(int user) {
+    public void updateUser(int user, ContentValues data) {
 
+        new AsynMethods.updateUserAsyncTask(contentResolver,data).execute(user);
     }
 
     @Override
@@ -68,6 +69,11 @@ public class UserRemoteRepository implements UsersRepository {
         AsynMethods.getUsersAsyncTask holis = new AsynMethods.getUsersAsyncTask(contentResolver,homeView);
         holis.execute();
        return holis.getData();
+    }
+
+    @Override
+    public void tearDown() {
+        homeView =null;
     }
 
 }
