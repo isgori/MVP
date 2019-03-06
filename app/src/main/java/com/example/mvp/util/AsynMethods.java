@@ -106,7 +106,6 @@ public class AsynMethods {
         }
     }
 
-
     public static class deleteAllUsersAsyncTask extends AsyncTask<Void, Void, Void> {
 
         ContentResolver contentResolver;
@@ -140,7 +139,6 @@ public class AsynMethods {
             return null;
         }
     }
-
 
     public static class fetchUsersAsyncTask extends AsyncTask<Integer, Void, Void> {
         private HomeContract.View homeView;
