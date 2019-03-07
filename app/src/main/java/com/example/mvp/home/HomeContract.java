@@ -19,8 +19,8 @@ public interface HomeContract {
 
         void fetchUsers(int count);
         void fetchUser(int _id);
-        void deleteUser(int _id);
-        void updateUser(int _id);
+        void deleteUser(Result entity,int _id);
+        void updateUser(Result entity,int _id);
         void deleteUsers();
 
         void saveData(List<Result> results);

@@ -6,7 +6,7 @@ import com.example.mvp.data.remote.randomapi.to.Result;
 
 import java.util.List;
 
-public interface UsersRepository {
+public interface UsersRepository  extends Repository<Result, Integer> {
 
     /// Is going to check if we have users on the database, and then show those
     /// if there are no users then load them from the REST API
@@ -23,10 +23,9 @@ public interface UsersRepository {
 
     void saveUsers(List<Result> lists);
 
-    void updateUser(int id, ContentValues data);
+    void updateUser(Result entity,int id);
 
-    void deleteUser(int id);
+    void deleteUser(Result entity,int id);
 
     void deleteUsers();
-
 }

@@ -39,14 +39,14 @@ public class HomePresenter implements HomeContract.Presenter {
     }
 
     @Override
-    public void deleteUser(int _id) {
-        userLocalRepository.deleteUser(_id);
+    public void deleteUser(Result entity,int _id) {
+        userLocalRepository.deleteUser(entity,_id);
 
     }
 
     @Override
-    public void updateUser(int _id) {
-        userLocalRepository.updateUser(_id);
+    public void updateUser(Result entity,int _id) {
+        userLocalRepository.updateUser(entity,_id);
     }
 
     @Override

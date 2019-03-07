@@ -1,20 +1,21 @@
 package com.example.mvp.data.remote.randomapi;
 
-import android.app.Application;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.util.Log;
 
 import com.example.mvp.data.UsersRepository;
 import com.example.mvp.data.local.UserContract;
 import com.example.mvp.data.remote.randomapi.to.Result;
 import com.example.mvp.home.HomeContract;
-import com.example.mvp.util.AsynMethods;
 import com.example.mvp.util.NetworkError;
 import com.example.mvp.util.NetworkManager;
+import com.google.gson.Gson;
 
+import org.json.JSONArray;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserRemoteRepository implements UsersRepository {
@@ -33,42 +34,129 @@ public class UserRemoteRepository implements UsersRepository {
 
     @Override
     public void fetchUsers(int count) {
-        new AsynMethods.fetchUsersAsyncTask(randomAPIService,homeView).execute(count);
+        randomAPIService.fetchRandomUsers(count, new RandomAPIService.RandomUsersCallback() {
+            @Override
+            public void OnUsersLoaded(List<Result> results) {
+                homeView.showUsers(results);
+            }
+
+            @Override
+            public void OnAPIError(NetworkError error) {
+                homeView.showError(error);
+            }
+        });
     }
 
     @Override
     public void fetchUser(int idUser) {
-        new AsynMethods.fetchUserAsyncTask(contentResolver,homeView).execute(idUser);
+        List<Result> list = new ArrayList<>();
+        try {
+            Cursor query = contentResolver.query(
+                    UserContract.UserEntry.buildMovieUri(idUser),
+                    columns,null,null,null
+            );
+
+
+            if (query!= null   ){
+                query.moveToPosition(0);
+                String json = query.getString(query.getColumnIndexOrThrow(UserContract.UserEntry.JSON_COLUMN));
+
+                if (json!= null){
+                    Gson gson = new Gson();
+                    JSONArray jsonArray = new JSONArray(json);
+                    Result result  = gson.fromJson(jsonArray.getJSONObject(0).toString(), Result.class);
+                    list.add(result);
+                }
+
+            }
+
+        }catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+
     }
 
     @Override
     public void saveUsers(List<Result> lists) {
-        new AsynMethods.saveUsersAsyncTask(contentResolver,homeView).execute(lists);
+
+        for (int i = 0; i < lists.size(); i++) {
+            Gson gson = new Gson();
+            String jsonS = gson.toJson(lists);
+            ContentValues userCV = UserContract.UserEntry.prepareNewUser(
+                    lists.get(i).getName().getFirst(), lists.get(i).getName().getLast(), jsonS);
+            Uri newUser = contentResolver.insert(UserContract.UserEntry.CONTENT_URI, userCV);
+            if (newUser == null) {
+                homeView.showError(NetworkError.BAD_REQUEST);
+            }
+        }
     }
 
     @Override
-    public void updateUser(int user, ContentValues data) {
+    public void updateUser(Result entity,int id) {
 
-        new AsynMethods.updateUserAsyncTask(contentResolver,data).execute(user);
+        try {
+            ContentValues contentValues = new ContentValues();
+            Gson gson = new Gson();
+            String jsonS = gson.toJson(entity);
+            contentValues.put(UserContract.UserEntry.NAME_COLUMN,entity.getName().getFirst());
+            contentValues.put(UserContract.UserEntry.LAST_COLUMN,entity.getName().getLast());
+            contentValues.put(UserContract.UserEntry.JSON_COLUMN,jsonS);
+            int query = contentResolver.update(
+                    UserContract.UserEntry.buildMovieUri(id),
+                    contentValues,
+                    null,
+                    null
+            );
+
+        }catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
     }
 
     @Override
-    public void deleteUser(int user) {
-        new AsynMethods.deleteUserAsyncTask(contentResolver).execute(user);
+    public void deleteUser(Result entity,int id) {
 
+        try {
+            contentResolver.delete(UserContract.UserEntry.CONTENT_URI,  UserContract.UserEntry._ID+" = " + id  , null);
+        }catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
     }
 
     @Override
     public void deleteUsers() {
-        new AsynMethods.deleteAllUsersAsyncTask(contentResolver).execute();
-
+        contentResolver.delete(UserContract.UserEntry.CONTENT_URI, null  , null);
     }
 
     @Override
     public List<Result> getUsers() {
-        AsynMethods.getUsersAsyncTask holis = new AsynMethods.getUsersAsyncTask(contentResolver,homeView);
-        holis.execute();
-       return holis.getData();
+        List<Result> list = new ArrayList<>();
+        try {
+            Cursor query = contentResolver.query(
+                    UserContract.UserEntry.CONTENT_URI,
+                    columns,null,null,null
+            );
+
+            int cantidad = query.getCount();
+            for (int i = 0; i < cantidad; i++) {
+                query.moveToPosition(i);
+                String json = query.getString(query.getColumnIndexOrThrow(UserContract.UserEntry.JSON_COLUMN));
+                if (json!= null){
+                    Gson gson = new Gson();
+                    JSONArray jsonArray = new JSONArray(json);
+                    Result result  = gson.fromJson(jsonArray.getJSONObject(0).toString(), Result.class);
+                    list.add(result);
+                }
+
+            }
+        }catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return  list;
     }
 
     @Override
